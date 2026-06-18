@@ -1,5 +1,6 @@
 ## Struktur Project
 
+```
 D-Celup-Fried-Chicken/
 ├── docs/
 │   └── schema.sql
@@ -44,6 +45,7 @@ D-Celup-Fried-Chicken/
 ├── start.ts
 ├── tsconfig.json
 └── vite.config.ts
+```
 
 ## Getting Started
 
