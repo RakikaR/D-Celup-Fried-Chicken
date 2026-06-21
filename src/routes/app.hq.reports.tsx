@@ -102,43 +102,49 @@ function ReportsPage() {
 
       <Card>
         <CardContent className="pt-6">
-          <div className="grid gap-4 sm:grid-cols-4">
-            <div className="space-y-1.5">
-              <Label>Outlet</Label>
-              <Select value={outletId} onValueChange={setOutletId}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Semua Outlet</SelectItem>
-                  {outlets.map((o) => (
-                    <SelectItem key={o.id} value={o.id}>
-                      {o.nama_outlet}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+          <div className="flex flex-col xl:flex-row gap-4 items-start xl:items-end justify-between">
+
+            <div className="grid gap-4 grid-cols-1 sm:grid-cols-3 w-full xl:flex-1">
+              <div className="space-y-1.5">
+                <Label>Outlet</Label>
+                <Select value={outletId} onValueChange={setOutletId}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Semua Outlet</SelectItem>
+                    {outlets.map((o) => (
+                      <SelectItem key={o.id} value={o.id}>
+                        {o.nama_outlet}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label>Dari Tanggal</Label>
+                <Input
+                  type="date"
+                  value={from}
+                  onChange={(e) => setFrom(e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label>Sampai Tanggal</Label>
+                <Input
+                  type="date"
+                  value={to}
+                  onChange={(e) => setTo(e.target.value)}
+                />
+              </div>
             </div>
-            <div className="space-y-1.5">
-              <Label>Dari Tanggal</Label>
-              <Input
-                type="date"
-                value={from}
-                onChange={(e) => setFrom(e.target.value)}
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label>Sampai Tanggal</Label>
-              <Input
-                type="date"
-                value={to}
-                onChange={(e) => setTo(e.target.value)}
-              />
-            </div>
-            <div className="flex items-end gap-2">
+
+            <div className="flex flex-wrap gap-2 w-full xl:w-auto pt-2 xl:pt-0">
               <Button
                 onClick={downloadPDF}
-                className="gap-2 bg-brand-red hover:bg-brand-red/90"
+                className="gap-2 bg-brand-red hover:bg-brand-red/90 flex-1 sm:flex-none"
               >
                 <FileDown className="h-4 w-4" />
                 Download PDF
@@ -146,12 +152,13 @@ function ReportsPage() {
               <Button
                 variant="outline"
                 onClick={shareWhatsApp}
-                className="gap-2"
+                className="gap-2 flex-1 sm:flex-none"
               >
                 <Send className="h-4 w-4" />
                 WhatsApp
               </Button>
             </div>
+
           </div>
         </CardContent>
       </Card>

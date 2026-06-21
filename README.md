@@ -4,11 +4,7 @@
 D-Celup-Fried-Chicken/
 ├── docs/
 │   └── schema.sql
-├── public/
-│   ├── file.svg
-│   ├── globe.svg
-│   ├── vercel.svg
-│   └── window.svg
+|
 ├── src/
 │   ├── components/
 │   │   ├── dashboard/ (Komponen grafik dan ringkasan)

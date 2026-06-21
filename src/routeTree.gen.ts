@@ -13,6 +13,8 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppOutletRouteImport } from './routes/app.outlet'
+import { Route as AppHqRouteImport } from './routes/app.hq'
 import { Route as AppOutletIndexRouteImport } from './routes/app.outlet.index'
 import { Route as AppHqIndexRouteImport } from './routes/app.hq.index'
 import { Route as AppOutletSalesRouteImport } from './routes/app.outlet.sales'
@@ -42,45 +44,55 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AppOutletIndexRoute = AppOutletIndexRouteImport.update({
-  id: '/outlet/',
-  path: '/outlet/',
+const AppOutletRoute = AppOutletRouteImport.update({
+  id: '/outlet',
+  path: '/outlet',
   getParentRoute: () => AppRoute,
+} as any)
+const AppHqRoute = AppHqRouteImport.update({
+  id: '/hq',
+  path: '/hq',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppOutletIndexRoute = AppOutletIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppOutletRoute,
 } as any)
 const AppHqIndexRoute = AppHqIndexRouteImport.update({
-  id: '/hq/',
-  path: '/hq/',
-  getParentRoute: () => AppRoute,
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppHqRoute,
 } as any)
 const AppOutletSalesRoute = AppOutletSalesRouteImport.update({
-  id: '/outlet/sales',
-  path: '/outlet/sales',
-  getParentRoute: () => AppRoute,
+  id: '/sales',
+  path: '/sales',
+  getParentRoute: () => AppOutletRoute,
 } as any)
 const AppOutletInventoryRoute = AppOutletInventoryRouteImport.update({
-  id: '/outlet/inventory',
-  path: '/outlet/inventory',
-  getParentRoute: () => AppRoute,
+  id: '/inventory',
+  path: '/inventory',
+  getParentRoute: () => AppOutletRoute,
 } as any)
 const AppOutletHistoryRoute = AppOutletHistoryRouteImport.update({
-  id: '/outlet/history',
-  path: '/outlet/history',
-  getParentRoute: () => AppRoute,
+  id: '/history',
+  path: '/history',
+  getParentRoute: () => AppOutletRoute,
 } as any)
 const AppHqReportsRoute = AppHqReportsRouteImport.update({
-  id: '/hq/reports',
-  path: '/hq/reports',
-  getParentRoute: () => AppRoute,
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => AppHqRoute,
 } as any)
 const AppHqProductsRoute = AppHqProductsRouteImport.update({
-  id: '/hq/products',
-  path: '/hq/products',
-  getParentRoute: () => AppRoute,
+  id: '/products',
+  path: '/products',
+  getParentRoute: () => AppHqRoute,
 } as any)
 const AppHqOutletsOutletIdRoute = AppHqOutletsOutletIdRouteImport.update({
-  id: '/hq/outlets/$outletId',
-  path: '/hq/outlets/$outletId',
-  getParentRoute: () => AppRoute,
+  id: '/outlets/$outletId',
+  path: '/outlets/$outletId',
+  getParentRoute: () => AppHqRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -88,6 +100,8 @@ export interface FileRoutesByFullPath {
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/app/hq': typeof AppHqRouteWithChildren
+  '/app/outlet': typeof AppOutletRouteWithChildren
   '/app/hq/products': typeof AppHqProductsRoute
   '/app/hq/reports': typeof AppHqReportsRoute
   '/app/outlet/history': typeof AppOutletHistoryRoute
@@ -117,6 +131,8 @@ export interface FileRoutesById {
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/app/hq': typeof AppHqRouteWithChildren
+  '/app/outlet': typeof AppOutletRouteWithChildren
   '/app/hq/products': typeof AppHqProductsRoute
   '/app/hq/reports': typeof AppHqReportsRoute
   '/app/outlet/history': typeof AppOutletHistoryRoute
@@ -133,6 +149,8 @@ export interface FileRouteTypes {
     | '/app'
     | '/auth'
     | '/sitemap.xml'
+    | '/app/hq'
+    | '/app/outlet'
     | '/app/hq/products'
     | '/app/hq/reports'
     | '/app/outlet/history'
@@ -161,6 +179,8 @@ export interface FileRouteTypes {
     | '/app'
     | '/auth'
     | '/sitemap.xml'
+    | '/app/hq'
+    | '/app/outlet'
     | '/app/hq/products'
     | '/app/hq/reports'
     | '/app/outlet/history'
@@ -208,85 +228,121 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app/outlet': {
+      id: '/app/outlet'
+      path: '/outlet'
+      fullPath: '/app/outlet'
+      preLoaderRoute: typeof AppOutletRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/hq': {
+      id: '/app/hq'
+      path: '/hq'
+      fullPath: '/app/hq'
+      preLoaderRoute: typeof AppHqRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/outlet/': {
       id: '/app/outlet/'
-      path: '/outlet'
+      path: '/'
       fullPath: '/app/outlet/'
       preLoaderRoute: typeof AppOutletIndexRouteImport
-      parentRoute: typeof AppRoute
+      parentRoute: typeof AppOutletRoute
     }
     '/app/hq/': {
       id: '/app/hq/'
-      path: '/hq'
+      path: '/'
       fullPath: '/app/hq/'
       preLoaderRoute: typeof AppHqIndexRouteImport
-      parentRoute: typeof AppRoute
+      parentRoute: typeof AppHqRoute
     }
     '/app/outlet/sales': {
       id: '/app/outlet/sales'
-      path: '/outlet/sales'
+      path: '/sales'
       fullPath: '/app/outlet/sales'
       preLoaderRoute: typeof AppOutletSalesRouteImport
-      parentRoute: typeof AppRoute
+      parentRoute: typeof AppOutletRoute
     }
     '/app/outlet/inventory': {
       id: '/app/outlet/inventory'
-      path: '/outlet/inventory'
+      path: '/inventory'
       fullPath: '/app/outlet/inventory'
       preLoaderRoute: typeof AppOutletInventoryRouteImport
-      parentRoute: typeof AppRoute
+      parentRoute: typeof AppOutletRoute
     }
     '/app/outlet/history': {
       id: '/app/outlet/history'
-      path: '/outlet/history'
+      path: '/history'
       fullPath: '/app/outlet/history'
       preLoaderRoute: typeof AppOutletHistoryRouteImport
-      parentRoute: typeof AppRoute
+      parentRoute: typeof AppOutletRoute
     }
     '/app/hq/reports': {
       id: '/app/hq/reports'
-      path: '/hq/reports'
+      path: '/reports'
       fullPath: '/app/hq/reports'
       preLoaderRoute: typeof AppHqReportsRouteImport
-      parentRoute: typeof AppRoute
+      parentRoute: typeof AppHqRoute
     }
     '/app/hq/products': {
       id: '/app/hq/products'
-      path: '/hq/products'
+      path: '/products'
       fullPath: '/app/hq/products'
       preLoaderRoute: typeof AppHqProductsRouteImport
-      parentRoute: typeof AppRoute
+      parentRoute: typeof AppHqRoute
     }
     '/app/hq/outlets/$outletId': {
       id: '/app/hq/outlets/$outletId'
-      path: '/hq/outlets/$outletId'
+      path: '/outlets/$outletId'
       fullPath: '/app/hq/outlets/$outletId'
       preLoaderRoute: typeof AppHqOutletsOutletIdRouteImport
-      parentRoute: typeof AppRoute
+      parentRoute: typeof AppHqRoute
     }
   }
 }
 
-interface AppRouteChildren {
+interface AppHqRouteChildren {
   AppHqProductsRoute: typeof AppHqProductsRoute
   AppHqReportsRoute: typeof AppHqReportsRoute
-  AppOutletHistoryRoute: typeof AppOutletHistoryRoute
-  AppOutletInventoryRoute: typeof AppOutletInventoryRoute
-  AppOutletSalesRoute: typeof AppOutletSalesRoute
   AppHqIndexRoute: typeof AppHqIndexRoute
-  AppOutletIndexRoute: typeof AppOutletIndexRoute
   AppHqOutletsOutletIdRoute: typeof AppHqOutletsOutletIdRoute
 }
 
-const AppRouteChildren: AppRouteChildren = {
+const AppHqRouteChildren: AppHqRouteChildren = {
   AppHqProductsRoute: AppHqProductsRoute,
   AppHqReportsRoute: AppHqReportsRoute,
+  AppHqIndexRoute: AppHqIndexRoute,
+  AppHqOutletsOutletIdRoute: AppHqOutletsOutletIdRoute,
+}
+
+const AppHqRouteWithChildren = AppHqRoute._addFileChildren(AppHqRouteChildren)
+
+interface AppOutletRouteChildren {
+  AppOutletHistoryRoute: typeof AppOutletHistoryRoute
+  AppOutletInventoryRoute: typeof AppOutletInventoryRoute
+  AppOutletSalesRoute: typeof AppOutletSalesRoute
+  AppOutletIndexRoute: typeof AppOutletIndexRoute
+}
+
+const AppOutletRouteChildren: AppOutletRouteChildren = {
   AppOutletHistoryRoute: AppOutletHistoryRoute,
   AppOutletInventoryRoute: AppOutletInventoryRoute,
   AppOutletSalesRoute: AppOutletSalesRoute,
-  AppHqIndexRoute: AppHqIndexRoute,
   AppOutletIndexRoute: AppOutletIndexRoute,
-  AppHqOutletsOutletIdRoute: AppHqOutletsOutletIdRoute,
+}
+
+const AppOutletRouteWithChildren = AppOutletRoute._addFileChildren(
+  AppOutletRouteChildren,
+)
+
+interface AppRouteChildren {
+  AppHqRoute: typeof AppHqRouteWithChildren
+  AppOutletRoute: typeof AppOutletRouteWithChildren
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppHqRoute: AppHqRouteWithChildren,
+  AppOutletRoute: AppOutletRouteWithChildren,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
