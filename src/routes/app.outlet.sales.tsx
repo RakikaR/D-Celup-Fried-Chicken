@@ -24,7 +24,7 @@ function OutletSales() {
       tanggal: today,
       total_penjualan: total,
       detail_item_terjual: detail,
-      status_setoran: existing[0]?.status_setoran ?? "pending",
+
       catatan: "",
     };
     mockApi.upsertSales(report);
