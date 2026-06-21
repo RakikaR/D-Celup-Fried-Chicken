@@ -33,7 +33,7 @@ export interface SalesDetail {
   subtotal: number;
 }
 
-export type SetoranStatus = "pending" | "disetor" | "verified";
+
 
 export interface SalesReport {
   id: string;
@@ -41,8 +41,8 @@ export interface SalesReport {
   tanggal: string;
   total_penjualan: number;
   detail_item_terjual: SalesDetail[];
-  status_setoran: SetoranStatus;
-  catatan: string;
+
+
 }
 
 export interface User {
