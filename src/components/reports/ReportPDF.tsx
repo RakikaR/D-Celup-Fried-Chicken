@@ -140,12 +140,7 @@ export function ReportDocument({
         {reports.map((report) => (
           <View key={report.id} style={styles.section} wrap={false}>
             <Text style={styles.sectionTitle}>Tanggal: {report.tanggal}</Text>
-            <View style={styles.row}>
-              <Text style={styles.label}>Status Setoran</Text>
-              <Text style={styles.value}>
-                {report.status_setoran.toUpperCase()}
-              </Text>
-            </View>
+            
 
             <View style={styles.tableHeader}>
               <Text style={styles.colProduk}>Produk</Text>
