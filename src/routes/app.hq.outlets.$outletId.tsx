@@ -171,7 +171,6 @@ function OutletDetail() {
                 <TableHead>Tanggal</TableHead>
                 <TableHead className="text-right">Total Penjualan</TableHead>
                 <TableHead className="text-right">Jumlah Item</TableHead>
-                <TableHead>Status Setoran</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -183,19 +182,6 @@ function OutletDetail() {
                   </TableCell>
                   <TableCell className="text-right">
                     {s.detail_item_terjual.length} item
-                  </TableCell>
-                  <TableCell>
-                    <Badge
-                      variant={
-                        s.status_setoran === "verified"
-                          ? "default"
-                          : s.status_setoran === "disetor"
-                            ? "secondary"
-                            : "outline"
-                      }
-                    >
-                      {s.status_setoran}
-                    </Badge>
                   </TableCell>
                 </TableRow>
               ))}
