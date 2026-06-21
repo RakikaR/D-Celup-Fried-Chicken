@@ -52,8 +52,7 @@ function OutletHistory() {
                 <TableHead>Tanggal</TableHead>
                 <TableHead className="text-right">Omset</TableHead>
                 <TableHead className="text-right">Porsi</TableHead>
-                <TableHead>Status Setoran</TableHead>
-                <TableHead>Catatan</TableHead>
+
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -74,22 +73,7 @@ function OutletHistory() {
                       Rp {s.total_penjualan.toLocaleString("id-ID")}
                     </TableCell>
                     <TableCell className="text-right">{porsi} porsi</TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={
-                          s.status_setoran === "verified"
-                            ? "default"
-                            : s.status_setoran === "disetor"
-                              ? "secondary"
-                              : "outline"
-                        }
-                      >
-                        {s.status_setoran}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-muted-foreground">
-                      {s.catatan || "-"}
-                    </TableCell>
+                    
                   </TableRow>
                 );
               })}
