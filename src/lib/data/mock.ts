@@ -161,13 +161,6 @@ function generateMockData() {
         }
       }
 
-      const statuses: Array<"pending" | "disetor" | "verified"> = [
-        "pending",
-        "disetor",
-        "verified",
-      ];
-      const status =
-        dayOffset === 0 ? "pending" : statuses[Math.floor(Math.random() * 3)];
 
       sales.push({
         id: generateId("sales"),
@@ -175,8 +168,8 @@ function generateMockData() {
         tanggal,
         total_penjualan: total,
         detail_item_terjual: detail,
-        status_setoran: status,
-        catatan: dayOffset === 0 ? "Hari ini" : "",
+
+
       });
     }
   }
@@ -312,7 +305,7 @@ export const mockApi = {
         outlet: o,
         omsetHariIni: sales.reduce((sum, s) => sum + s.total_penjualan, 0),
         sisaStokItems: inv.length,
-        statusSetoran: sales[0]?.status_setoran ?? "pending",
+
       };
     });
 
