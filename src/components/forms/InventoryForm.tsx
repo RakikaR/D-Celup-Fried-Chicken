@@ -123,10 +123,10 @@ export function InventoryForm({
               <TableRow>
                 <TableHead className="min-w-[160px]">Nama Bahan</TableHead>
                 <TableHead>Satuan</TableHead>
-                <TableHead className="text-right">Stok Awal</TableHead>
-                <TableHead className="text-right">Stok Masuk</TableHead>
-                <TableHead className="text-right">Stok Akhir</TableHead>
-                <TableHead className="text-right">Terpakai</TableHead>
+                <TableHead>Stok Awal</TableHead>
+                <TableHead>Stok Masuk</TableHead>
+                <TableHead>Stok Akhir</TableHead>
+                <TableHead>Terpakai</TableHead>
                 <TableHead className="w-[40px]" />
               </TableRow>
             </TableHeader>
@@ -182,7 +182,7 @@ export function InventoryForm({
                       className="w-24 text-right"
                     />
                   </TableCell>
-                  <TableCell className="text-right font-medium text-brand-red">
+                  <TableCell className="font-medium text-brand-red">
                     {item.terpakai}
                   </TableCell>
                   <TableCell>
