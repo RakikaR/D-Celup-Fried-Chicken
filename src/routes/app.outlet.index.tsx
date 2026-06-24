@@ -41,7 +41,7 @@ function OutletDashboard() {
     [todaySales],
   );
 
-  const statusSetoran = todaySales[0]?.status_setoran ?? "pending";
+
 
   return (
     <div className="space-y-6">
@@ -52,7 +52,7 @@ function OutletDashboard() {
         <p className="text-sm text-muted-foreground">{outlet?.lokasi}</p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -77,27 +77,6 @@ function OutletDashboard() {
             <div className="text-2xl font-bold text-foreground">
               {totalPorsi} porsi
             </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Status Setoran
-            </CardTitle>
-            <TrendingUp className="h-5 w-5 text-brand-gold" />
-          </CardHeader>
-          <CardContent>
-            <Badge
-              variant={
-                statusSetoran === "verified"
-                  ? "default"
-                  : statusSetoran === "disetor"
-                    ? "secondary"
-                    : "outline"
-              }
-            >
-              {statusSetoran.toUpperCase()}
-            </Badge>
           </CardContent>
         </Card>
       </div>

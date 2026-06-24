@@ -180,7 +180,6 @@ function ReportsPage() {
                 <TableHead>Outlet</TableHead>
                 <TableHead className="text-right">Omset</TableHead>
                 <TableHead className="text-right">Porsi</TableHead>
-                <TableHead>Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -198,19 +197,6 @@ function ReportsPage() {
                       Rp {s.total_penjualan.toLocaleString("id-ID")}
                     </TableCell>
                     <TableCell className="text-right">{porsi} porsi</TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={
-                          s.status_setoran === "verified"
-                            ? "default"
-                            : s.status_setoran === "disetor"
-                              ? "secondary"
-                              : "outline"
-                        }
-                      >
-                        {s.status_setoran}
-                      </Badge>
-                    </TableCell>
                   </TableRow>
                 );
               })}

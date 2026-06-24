@@ -12,23 +12,23 @@ export const Route = createFileRoute("/auth")({
 const demoUsers = [
   {
     id: "user-hq",
-    label: "Admin Pusat (HQ)",
-    desc: "Akses dashboard & laporan semua outlet",
+    label: "Owner",
+
   },
   {
     id: "user-o1",
-    label: "Staff Outlet 1 — Sudirman",
-    desc: "Input stok & penjualan Outlet 1",
+    label: "Staff Outlet 1 — Genuk",
+
   },
   {
     id: "user-o2",
-    label: "Staff Outlet 2 — Ahmad Yani",
-    desc: "Input stok & penjualan Outlet 2",
+    label: "Staff Outlet 2 — Tlogosari",
+
   },
   {
     id: "user-o3",
-    label: "Staff Outlet 3 — Diponegoro",
-    desc: "Input stok & penjualan Outlet 3",
+    label: "Staff Outlet 3 — Kaligawe",
+
   },
 ];
 
@@ -62,7 +62,7 @@ function AuthPage() {
         <Card>
           <CardHeader>
             <CardTitle className="text-center text-lg">
-              Pilih Akun Demo
+              Pilih Akun
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -85,8 +85,7 @@ function AuthPage() {
         </Card>
 
         <p className="mt-6 text-center text-xs text-muted-foreground">
-          Belum ada backend database. Semua data disimpan di localStorage
-          browser.
+          Footer
         </p>
       </div>
     </div>

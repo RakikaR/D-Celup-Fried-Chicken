@@ -32,7 +32,7 @@ function HQDashboard() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-foreground">Dashboard Pusat</h1>
+        <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
         <p className="text-sm text-muted-foreground">
           Ringkasan operasional seluruh outlet
         </p>
@@ -63,7 +63,6 @@ function HQDashboard() {
                 <TableHead>Outlet</TableHead>
                 <TableHead className="text-right">Omset Hari Ini</TableHead>
                 <TableHead className="text-right">Item Stok</TableHead>
-                <TableHead>Status Setoran</TableHead>
                 <TableHead className="w-[100px]" />
               </TableRow>
             </TableHeader>
@@ -82,19 +81,7 @@ function HQDashboard() {
                   <TableCell className="text-right">
                     {s.sisaStokItems} item
                   </TableCell>
-                  <TableCell>
-                    <Badge
-                      variant={
-                        s.statusSetoran === "verified"
-                          ? "default"
-                          : s.statusSetoran === "disetor"
-                            ? "secondary"
-                            : "outline"
-                      }
-                    >
-                      {s.statusSetoran}
-                    </Badge>
-                  </TableCell>
+                  
                   <TableCell>
                     <Link
                       to="/app/hq/outlets/$outletId"

@@ -22,15 +22,18 @@ function SidebarItem({
   icon: Icon,
   label,
   active,
+  onClick,
 }: {
   to: string;
   icon: React.ElementType;
   label: string;
   active?: boolean;
+  onClick?: () => void;
 }) {
   return (
     <Link
       to={to}
+      onClick={onClick}
       className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${active
           ? "bg-brand-red text-primary-foreground"
           : "text-foreground hover:bg-accent"
@@ -73,12 +76,12 @@ export function AppShell() {
         {isAdmin && (
           <>
             <p className="mb-2 mt-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Admin Pusat
+              Owner
             </p>
             <SidebarItem
               to="/app/hq"
               icon={LayoutDashboard}
-              label="Dashboard Pusat"
+              label="Dashboard"
               active={path === "/app/hq"}
             />
             <SidebarItem
@@ -146,7 +149,7 @@ export function AppShell() {
         <div className="mb-3 px-3">
           <p className="text-sm font-medium text-foreground">{user?.nama}</p>
           <p className="text-xs text-muted-foreground">
-            {isAdmin ? "Admin Pusat" : "Staff Outlet"}
+            {isAdmin ? "Owner" : "Staff Outlet"}
           </p>
         </div>
         <Button

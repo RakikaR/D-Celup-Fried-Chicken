@@ -145,23 +145,7 @@ function ProductsPage() {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-1.5">
-                <Label>Status</Label>
-                <Select
-                  value={form.is_active ? "active" : "inactive"}
-                  onValueChange={(v) =>
-                    setForm((f) => ({ ...f, is_active: v === "active" }))
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="active">Aktif</SelectItem>
-                    <SelectItem value="inactive">Nonaktif</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              
             </div>
             <div className="flex gap-2">
               <Button
@@ -188,7 +172,7 @@ function ProductsPage() {
                 <TableHead>Nama Produk</TableHead>
                 <TableHead>Kategori</TableHead>
                 <TableHead className="text-right">Harga</TableHead>
-                <TableHead>Status</TableHead>
+
                 <TableHead className="w-[120px]" />
               </TableRow>
             </TableHeader>
@@ -200,17 +184,7 @@ function ProductsPage() {
                   <TableCell className="text-right">
                     Rp {p.harga.toLocaleString("id-ID")}
                   </TableCell>
-                  <TableCell>
-                    <span
-                      className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
-                        p.is_active
-                          ? "bg-green-100 text-green-700"
-                          : "bg-gray-100 text-gray-600"
-                      }`}
-                    >
-                      {p.is_active ? "Aktif" : "Nonaktif"}
-                    </span>
-                  </TableCell>
+                  
                   <TableCell>
                     <div className="flex gap-1">
                       <Button
