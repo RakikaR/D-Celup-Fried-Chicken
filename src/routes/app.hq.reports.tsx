@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useMemo, useCallback } from "react";
-import { FileDown, Send, Calendar } from "lucide-react";
+import { useState, useEffect, useMemo, useCallback } from "react";
+import { FileDown, Send } from "lucide-react";
 import { Button } from "@/components/UI/button";
 import { Input } from "@/components/UI/input";
 import { Label } from "@/components/UI/label";
@@ -20,18 +20,21 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/UI/table";
-import { Badge } from "@/components/UI/badge";
-import { mockApi } from "@/lib/data/mock";
+import { getOutlets, getProducts } from "@/lib/api/outlets.functions";
+import { getSales } from "@/lib/api/sales.functions";
 import { ReportDocument } from "@/components/reports/ReportPDF";
 import { pdf } from "@react-pdf/renderer";
+import type { Outlet, Product, SalesReport } from "@/lib/data/types";
 
 export const Route = createFileRoute("/app/hq/reports")({
   component: ReportsPage,
 });
 
 function ReportsPage() {
-  const outlets = mockApi.getOutlets();
-  const products = mockApi.getProducts();
+  const [outlets, setOutlets] = useState<Outlet[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [allSales, setAllSales] = useState<SalesReport[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const [outletId, setOutletId] = useState("all");
   const [from, setFrom] = useState(() => {
@@ -41,12 +44,40 @@ function ReportsPage() {
   });
   const [to, setTo] = useState(() => new Date().toISOString().slice(0, 10));
 
-  const filteredSales = useMemo(() => {
-    let data = mockApi.getSales();
-    if (outletId !== "all") data = data.filter((s) => s.outlet_id === outletId);
-    data = data.filter((s) => s.tanggal >= from && s.tanggal <= to);
-    return data.sort((a, b) => (a.tanggal > b.tanggal ? -1 : 1));
+  // Fetch semua data awal
+  useEffect(() => {
+    Promise.all([
+      getOutlets(),
+      getProducts(),
+      getSales({ data: {} }),
+    ])
+      .then(([o, p, s]) => {
+        setOutlets(o as Outlet[]);
+        setProducts(p as Product[]);
+        setAllSales(s as unknown as SalesReport[]);
+      })
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, []);
+
+  // Re-fetch sales saat filter berubah
+  useEffect(() => {
+    if (loading) return;
+    getSales({
+      data: {
+        outlet_id: outletId !== "all" ? outletId : undefined,
+        from,
+        to,
+      },
+    })
+      .then((s) => setAllSales(s as unknown as SalesReport[]))
+      .catch(console.error);
   }, [outletId, from, to]);
+
+  const filteredSales = useMemo(
+    () => [...allSales].sort((a, b) => (a.tanggal > b.tanggal ? -1 : 1)),
+    [allSales],
+  );
 
   const totalOmset = useMemo(
     () => filteredSales.reduce((sum, s) => sum + s.total_penjualan, 0),
@@ -91,6 +122,14 @@ function ReportsPage() {
     window.open(`https://wa.me/?text=${text}`, "_blank");
   }, [from, to, totalOmset, filteredSales]);
 
+  if (loading) {
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand-red border-t-transparent" />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -103,7 +142,6 @@ function ReportsPage() {
       <Card>
         <CardContent className="pt-6">
           <div className="flex flex-col xl:flex-row gap-4 items-start xl:items-end justify-between">
-
             <div className="grid gap-4 grid-cols-1 sm:grid-cols-3 w-full xl:flex-1">
               <div className="space-y-1.5">
                 <Label>Outlet</Label>
@@ -158,7 +196,6 @@ function ReportsPage() {
                 WhatsApp
               </Button>
             </div>
-
           </div>
         </CardContent>
       </Card>
@@ -203,7 +240,7 @@ function ReportsPage() {
               {filteredSales.length === 0 && (
                 <TableRow>
                   <TableCell
-                    colSpan={5}
+                    colSpan={4}
                     className="text-center text-muted-foreground py-8"
                   >
                     Tidak ada data untuk periode ini
