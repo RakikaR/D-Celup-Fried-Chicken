@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { InventoryForm } from "@/components/forms/InventoryForm";
 import { useAuth } from "@/hooks/use-auth";
-import { mockApi } from "@/lib/data/mock";
+import { getInventory, upsertInventory } from "@/lib/api/inventory.functions";
 import type { InventoryItem } from "@/lib/data/types";
 
 export const Route = createFileRoute("/app/outlet/inventory")({
@@ -11,23 +11,47 @@ export const Route = createFileRoute("/app/outlet/inventory")({
 });
 
 function OutletInventory() {
-  const { currentOutletId } = useAuth();
-  const outletId = currentOutletId ?? "outlet-1";
+  const { currentOutletId, user } = useAuth();
+  const outletId = currentOutletId ?? "";
   const today = new Date().toISOString().slice(0, 10);
 
   const [initialItems, setInitialItems] = useState<InventoryItem[]>([]);
   const [loaded, setLoaded] = useState(false);
 
+  async function fetchItems() {
+    if (!outletId) return;
+    const items = await getInventory({ data: { outlet_id: outletId, tanggal: today } });
+    setInitialItems(items as InventoryItem[]);
+  }
+
   useEffect(() => {
-    const items = mockApi.getInventory(outletId, today);
-    setInitialItems(items);
-    setLoaded(true);
+    fetchItems()
+      .catch(console.error)
+      .finally(() => setLoaded(true));
   }, [outletId, today]);
 
-  function handleSave(items: InventoryItem[]) {
-    mockApi.upsertInventory(items);
-    setInitialItems(mockApi.getInventory(outletId, today));
-    toast.success("Stok opname berhasil disimpan!");
+  async function handleSave(items: InventoryItem[]) {
+    try {
+      await upsertInventory({
+        data: {
+          items: items.map((item) => ({
+            outlet_id: outletId,
+            nama_bahan: item.nama_bahan,
+            satuan: item.satuan,
+            stok_awal: item.stok_awal,
+            stok_masuk: item.stok_masuk,
+            stok_akhir: item.stok_akhir,
+            tanggal: today,
+            created_by: user?.id,
+          })),
+        },
+      });
+      await fetchItems();
+      toast.success("Stok opname berhasil disimpan!");
+    } catch (err) {
+      toast.error("Gagal menyimpan stok opname");
+      console.error(err);
+    }
   }
 
   return (
