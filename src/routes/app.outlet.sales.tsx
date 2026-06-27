@@ -1,34 +1,55 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { SalesForm } from "@/components/forms/SalesForm";
 import { useAuth } from "@/hooks/use-auth";
-import { mockApi } from "@/lib/data/mock";
-import type { SalesDetail } from "@/lib/data/types";
+import { getProducts } from "@/lib/api/outlets.functions";
+import { upsertSales } from "@/lib/api/sales.functions";
+import type { Product, SalesDetail } from "@/lib/data/types";
 
 export const Route = createFileRoute("/app/outlet/sales")({
   component: OutletSales,
 });
 
 function OutletSales() {
-  const { currentOutletId } = useAuth();
-  const outletId = currentOutletId ?? "outlet-1";
+  const { currentOutletId, user } = useAuth();
+  const outletId = currentOutletId ?? "";
   const today = new Date().toISOString().slice(0, 10);
-  const products = mockApi.getProducts();
 
-  function handleSave(total: number, detail: SalesDetail[]) {
-    const existing = mockApi.getSales(outletId, today, today);
-    const report = {
-      id: existing[0]?.id ?? `sales-${Date.now()}`,
-      outlet_id: outletId,
-      tanggal: today,
-      total_penjualan: total,
-      detail_item_terjual: detail,
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
 
-      catatan: "",
-    };
-    mockApi.upsertSales(report);
-    toast.success("Data penjualan berhasil disimpan!");
+  useEffect(() => {
+    getProducts()
+      .then((p) => setProducts(p as Product[]))
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, []);
+
+  async function handleSave(total: number, detail: SalesDetail[]) {
+    try {
+      await upsertSales({
+        data: {
+          outlet_id: outletId,
+          tanggal: today,
+          total_penjualan: total,
+          detail_item_terjual: detail,
+          created_by: user?.id,
+        },
+      });
+      toast.success("Data penjualan berhasil disimpan!");
+    } catch (err) {
+      toast.error("Gagal menyimpan data penjualan");
+      console.error(err);
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand-red border-t-transparent" />
+      </div>
+    );
   }
 
   return (

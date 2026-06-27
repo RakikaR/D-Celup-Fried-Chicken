@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, Outlet, useLocation } from "@tanstack/react-router";
 import {
   LayoutDashboard,
@@ -14,8 +14,15 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/UI/button";
-import { mockApi } from "@/lib/data/mock";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/UI/sheet";
+import { getOutlets } from "@/lib/api/outlets.functions";
+
+// Tipe data outlet (sesuai dengan yang dikembalikan getOutlets)
+type Outlet = {
+  id: string;
+  nama_outlet: string;
+  lokasi: string | null;
+};
 
 function SidebarItem({
   to,
@@ -50,11 +57,14 @@ export function AppShell() {
   const location = useLocation();
   const path = location.pathname;
 
-  const currentOutlet = useMemo(() => {
-    if (!currentOutletId) return null;
-    return mockApi.getOutlets().find((o) => o.id === currentOutletId) ?? null;
-  }, [currentOutletId]);
+  const [outlets, setOutlets] = useState<Outlet[]>([]);
 
+  useEffect(() => {
+    getOutlets().then(setOutlets).catch(console.error);
+  }, []);
+
+  // Cari nama outlet aktif dari data yang sudah di-fetch
+  const currentOutlet = outlets.find((o) => o.id === currentOutletId) ?? null;
   const outletName = currentOutlet?.nama_outlet ?? "Outlet";
 
   // 1. KONTEN SIDEBAR DIPISAH AGAR BISA DIPAKAI DI DESKTOP & MOBILE MENU
@@ -100,7 +110,7 @@ export function AppShell() {
             <p className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Outlet Cabang
             </p>
-            {mockApi.getOutlets().map((o) => (
+            {outlets.map((o) => (
               <SidebarItem
                 key={o.id}
                 to={`/app/hq/outlets/${o.id}`}

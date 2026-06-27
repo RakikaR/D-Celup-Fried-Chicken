@@ -1,8 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo } from "react";
+import { useState, useEffect } from "react";
 import { CalendarDays } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/UI/card";
-import { Badge } from "@/components/UI/badge";
+import { Card, CardContent } from "@/components/UI/card";
 import {
   Table,
   TableBody,
@@ -12,7 +11,8 @@ import {
   TableRow,
 } from "@/components/UI/table";
 import { useAuth } from "@/hooks/use-auth";
-import { mockApi } from "@/lib/data/mock";
+import { getSales } from "@/lib/api/sales.functions";
+import type { SalesReport } from "@/lib/data/types";
 
 export const Route = createFileRoute("/app/outlet/history")({
   component: OutletHistory,
@@ -20,20 +20,37 @@ export const Route = createFileRoute("/app/outlet/history")({
 
 function OutletHistory() {
   const { currentOutletId } = useAuth();
-  const outletId = currentOutletId ?? "outlet-1";
+  const outletId = currentOutletId ?? "";
+
   const today = new Date().toISOString().slice(0, 10);
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+  const from = thirtyDaysAgo.toISOString().slice(0, 10);
 
-  const sales = useMemo(
-    () =>
-      mockApi.getSales(
-        outletId,
-        thirtyDaysAgo.toISOString().slice(0, 10),
-        today,
-      ),
-    [outletId, today],
-  );
+  const [sales, setSales] = useState<SalesReport[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!outletId) return;
+    getSales({ data: { outlet_id: outletId, from, to: today } })
+      .then((data) =>
+        setSales(
+          (data as unknown as SalesReport[]).sort((a, b) =>
+            a.tanggal > b.tanggal ? -1 : 1,
+          ),
+        ),
+      )
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, [outletId]);
+
+  if (loading) {
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand-red border-t-transparent" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -52,7 +69,6 @@ function OutletHistory() {
                 <TableHead>Tanggal</TableHead>
                 <TableHead className="text-right">Omset</TableHead>
                 <TableHead className="text-right">Porsi</TableHead>
-
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -73,14 +89,13 @@ function OutletHistory() {
                       Rp {s.total_penjualan.toLocaleString("id-ID")}
                     </TableCell>
                     <TableCell className="text-right">{porsi} porsi</TableCell>
-                    
                   </TableRow>
                 );
               })}
               {sales.length === 0 && (
                 <TableRow>
                   <TableCell
-                    colSpan={5}
+                    colSpan={3}
                     className="text-center text-muted-foreground py-8"
                   >
                     Belum ada data penjualan

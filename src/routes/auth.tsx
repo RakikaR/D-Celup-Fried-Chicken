@@ -1,48 +1,53 @@
+/**
+ * src/routes/auth.tsx
+ *
+ * Halaman login dengan email + password.
+ * Menggantikan halaman "pilih akun" dari versi mock.
+ */
+
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useState, useEffect } from "react";
 import { ChefHat } from "lucide-react";
 import { Button } from "@/components/UI/button";
+import { Input } from "@/components/UI/input";
+import { Label } from "@/components/UI/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/UI/card";
 import { useAuth } from "@/hooks/use-auth";
-import { useEffect } from "react";
 
 export const Route = createFileRoute("/auth")({
   component: AuthPage,
 });
 
-const demoUsers = [
-  {
-    id: "user-hq",
-    label: "Owner",
-
-  },
-  {
-    id: "user-o1",
-    label: "Staff Outlet 1 — Genuk",
-
-  },
-  {
-    id: "user-o2",
-    label: "Staff Outlet 2 — Tlogosari",
-
-  },
-  {
-    id: "user-o3",
-    label: "Staff Outlet 3 — Kaligawe",
-
-  },
-];
-
 function AuthPage() {
   const { login, user } = useAuth();
   const navigate = useNavigate();
 
-  // Handle redirect after user login
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  // Redirect jika sudah login
   useEffect(() => {
     if (user) {
       const to = user.role === "hq_admin" ? "/app/hq" : "/app/outlet";
       navigate({ to, replace: true });
     }
   }, [user, navigate]);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
+
+    const { error } = await login(email, password);
+    if (error) {
+      setError(error);
+    }
+    // Jika berhasil, useEffect di atas yang handle redirect
+
+    setLoading(false);
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
@@ -61,32 +66,52 @@ function AuthPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-center text-lg">
-              Pilih Akun
-            </CardTitle>
+            <CardTitle className="text-center text-lg">Masuk</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
-            {demoUsers.map((u) => (
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="nama@dcelup.id"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  autoComplete="email"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="password">Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  autoComplete="current-password"
+                />
+              </div>
+
+              {error && (
+                <p className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
+                  {error}
+                </p>
+              )}
+
               <Button
-                key={u.id}
-                variant="outline"
-                className="h-auto w-full justify-start gap-3 px-4 py-3 text-left transition-colors hover:border-brand-red hover:bg-brand-red/5"
-                onClick={() => login(u.id)}
+                type="submit"
+                disabled={loading}
+                className="w-full bg-brand-red hover:bg-brand-red/90"
               >
-                <div>
-                  <p className="text-sm font-semibold text-foreground">
-                    {u.label}
-                  </p>
-                  <p className="text-xs text-muted-foreground">{u.desc}</p>
-                </div>
+                {loading ? "Memverifikasi..." : "Masuk"}
               </Button>
-            ))}
+            </form>
           </CardContent>
         </Card>
-
-        <p className="mt-6 text-center text-xs text-muted-foreground">
-          Footer
-        </p>
       </div>
     </div>
   );

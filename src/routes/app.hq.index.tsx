@@ -1,10 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo } from "react";
+import { useState, useEffect } from "react";
 import {
   Store,
   TrendingUp,
   Package,
-  AlertCircle,
   ArrowRight,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/UI/card";
@@ -19,15 +18,40 @@ import {
 } from "@/components/UI/table";
 import { SummaryCards } from "@/components/dashboard/SummaryCards";
 import { SalesChart } from "@/components/dashboard/SalesChart";
-import { mockApi } from "@/lib/data/mock";
+import { getDashboardSummary } from "@/lib/api/dashboard.functions";
 
 export const Route = createFileRoute("/app/hq/")({
   component: HQDashboard,
 });
 
+type DashboardSummary = Awaited<ReturnType<typeof getDashboardSummary>>;
+
 function HQDashboard() {
-  const summary = useMemo(() => mockApi.getDashboardSummary(), []);
-  const outlets = mockApi.getOutlets();
+  const [summary, setSummary] = useState<DashboardSummary | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getDashboardSummary({ data: {} })
+      .then(setSummary)
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand-red border-t-transparent" />
+      </div>
+    );
+  }
+
+  if (!summary) {
+    return (
+      <div className="flex h-64 items-center justify-center text-muted-foreground">
+        Gagal memuat data dashboard.
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -61,8 +85,7 @@ function HQDashboard() {
             <TableHeader>
               <TableRow>
                 <TableHead>Outlet</TableHead>
-                <TableHead className="text-right">Omset Hari Ini</TableHead>
-                <TableHead className="text-right">Item Stok</TableHead>
+                <TableHead>Omset Hari Ini</TableHead>
                 <TableHead className="w-[100px]" />
               </TableRow>
             </TableHeader>
@@ -75,14 +98,10 @@ function HQDashboard() {
                       {s.outlet.nama_outlet}
                     </div>
                   </TableCell>
-                  <TableCell className="text-right">
+                  <TableCell>
                     Rp {s.omsetHariIni.toLocaleString("id-ID")}
                   </TableCell>
                   <TableCell className="text-right">
-                    {s.sisaStokItems} item
-                  </TableCell>
-                  
-                  <TableCell>
                     <Link
                       to="/app/hq/outlets/$outletId"
                       params={{ outletId: s.outlet.id }}
