@@ -1,8 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo } from "react";
-import { ArrowLeft, Store, TrendingUp, Package } from "lucide-react";
+import { useState, useEffect, useMemo } from "react";
+import { ArrowLeft, TrendingUp, Package } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/UI/card";
-import { Badge } from "@/components/UI/badge";
 import {
   Table,
   TableBody,
@@ -11,7 +10,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/UI/table";
-import { mockApi } from "@/lib/data/mock";
+import { getOutlets } from "@/lib/api/outlets.functions";
+import { getInventory } from "@/lib/api/inventory.functions";
+import { getSales } from "@/lib/api/sales.functions";
+import type { Outlet, InventoryItem, SalesReport } from "@/lib/data/types";
 
 export const Route = createFileRoute("/app/hq/outlets/$outletId")({
   component: OutletDetail,
@@ -19,12 +21,33 @@ export const Route = createFileRoute("/app/hq/outlets/$outletId")({
 
 function OutletDetail() {
   const { outletId } = Route.useParams();
-  const outlets = mockApi.getOutlets();
-  const outlet = outlets.find((o) => o.id === outletId);
-
   const today = new Date().toISOString().slice(0, 10);
-  const inventory = mockApi.getInventory(outletId, today);
-  const sales = mockApi.getSales(outletId);
+
+  const [outlet, setOutlet] = useState<Outlet | null>(null);
+  const [inventory, setInventory] = useState<InventoryItem[]>([]);
+  const [sales, setSales] = useState<SalesReport[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
+
+  useEffect(() => {
+    Promise.all([
+      getOutlets(),
+      getInventory({ data: { outlet_id: outletId, tanggal: today } }),
+      getSales({ data: { outlet_id: outletId } }),
+    ])
+      .then(([outlets, inv, sal]) => {
+        const found = (outlets as Outlet[]).find((o) => o.id === outletId);
+        if (!found) {
+          setNotFound(true);
+        } else {
+          setOutlet(found);
+          setInventory(inv as InventoryItem[]);
+          setSales(sal as unknown as SalesReport[]);
+        }
+      })
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, [outletId, today]);
 
   const totalOmset = useMemo(
     () => sales.reduce((s, r) => s + r.total_penjualan, 0),
@@ -39,7 +62,15 @@ function OutletDetail() {
     [sales],
   );
 
-  if (!outlet) {
+  if (loading) {
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand-red border-t-transparent" />
+      </div>
+    );
+  }
+
+  if (notFound || !outlet) {
     return (
       <div className="flex h-64 items-center justify-center text-muted-foreground">
         Outlet tidak ditemukan
@@ -134,15 +165,9 @@ function OutletDetail() {
                       {item.nama_bahan}
                     </TableCell>
                     <TableCell>{item.satuan}</TableCell>
-                    <TableCell className="text-right">
-                      {item.stok_awal}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {item.stok_masuk}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {item.stok_akhir}
-                    </TableCell>
+                    <TableCell className="text-right">{item.stok_awal}</TableCell>
+                    <TableCell className="text-right">{item.stok_masuk}</TableCell>
+                    <TableCell className="text-right">{item.stok_akhir}</TableCell>
                     <TableCell className="text-right font-medium text-brand-red">
                       {item.terpakai}
                     </TableCell>
@@ -185,6 +210,16 @@ function OutletDetail() {
                   </TableCell>
                 </TableRow>
               ))}
+              {sales.length === 0 && (
+                <TableRow>
+                  <TableCell
+                    colSpan={3}
+                    className="text-center text-muted-foreground py-8"
+                  >
+                    Belum ada data penjualan
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </CardContent>
