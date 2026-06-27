@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   ClipboardList,
   ShoppingCart,
@@ -9,10 +9,11 @@ import {
 } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/UI/card";
-import { Button } from "@/components/UI/button";
-import { Badge } from "@/components/UI/badge";
 import { useAuth } from "@/hooks/use-auth";
-import { mockApi } from "@/lib/data/mock";
+import { getOutlets } from "@/lib/api/outlets.functions";
+import { getSales } from "@/lib/api/sales.functions";
+import { getInventory } from "@/lib/api/inventory.functions";
+import type { Outlet, SalesReport, InventoryItem } from "@/lib/data/types";
 
 export const Route = createFileRoute("/app/outlet/")({
   component: OutletDashboard,
@@ -20,12 +21,29 @@ export const Route = createFileRoute("/app/outlet/")({
 
 function OutletDashboard() {
   const { currentOutletId } = useAuth();
-  const outletId = currentOutletId ?? "outlet-1";
-
+  const outletId = currentOutletId ?? "";
   const today = new Date().toISOString().slice(0, 10);
-  const outlet = mockApi.getOutlets().find((o) => o.id === outletId);
-  const todaySales = mockApi.getSales(outletId, today, today);
-  const todayInventory = mockApi.getInventory(outletId, today);
+
+  const [outlet, setOutlet] = useState<Outlet | null>(null);
+  const [todaySales, setTodaySales] = useState<SalesReport[]>([]);
+  const [todayInventory, setTodayInventory] = useState<InventoryItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!outletId) return;
+    Promise.all([
+      getOutlets(),
+      getSales({ data: { outlet_id: outletId, from: today, to: today } }),
+      getInventory({ data: { outlet_id: outletId, tanggal: today } }),
+    ])
+      .then(([outlets, sales, inv]) => {
+        setOutlet((outlets as Outlet[]).find((o) => o.id === outletId) ?? null);
+        setTodaySales(sales as unknown as SalesReport[]);
+        setTodayInventory(inv as InventoryItem[]);
+      })
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, [outletId, today]);
 
   const totalOmset = useMemo(
     () => todaySales.reduce((sum, s) => sum + s.total_penjualan, 0),
@@ -41,13 +59,19 @@ function OutletDashboard() {
     [todaySales],
   );
 
-
+  if (loading) {
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand-red border-t-transparent" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-foreground">
-          {outlet?.nama_outlet}
+          {outlet?.nama_outlet ?? "Dashboard Outlet"}
         </h1>
         <p className="text-sm text-muted-foreground">{outlet?.lokasi}</p>
       </div>
