@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus, Pencil, Trash2, Save, X } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/UI/button";
 import { Input } from "@/components/UI/input";
 import { Label } from "@/components/UI/label";
@@ -20,7 +21,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/UI/table";
-import { mockApi } from "@/lib/data/mock";
+import {
+  getProducts,
+  upsertProduct,
+  deactivateProduct,
+} from "@/lib/api/outlets.functions";
 import type { Product } from "@/lib/data/types";
 
 export const Route = createFileRoute("/app/hq/products")({
@@ -28,15 +33,26 @@ export const Route = createFileRoute("/app/hq/products")({
 });
 
 function ProductsPage() {
-  const [products, setProducts] = useState<Product[]>(() =>
-    mockApi.getProducts(),
-  );
-  const [editing, setEditing] = useState<Product | null>(null);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [editing, setEditing] = useState<Partial<Product> | null>(null);
   const [form, setForm] = useState<Partial<Product>>({});
 
-  function refresh() {
-    setProducts(mockApi.getProducts());
+  // Fetch produk dari database
+  async function refresh() {
+    try {
+      const data = await getProducts();
+      setProducts(data as Product[]);
+    } catch (err) {
+      toast.error("Gagal memuat produk");
+      console.error(err);
+    }
   }
+
+  useEffect(() => {
+    refresh().finally(() => setLoading(false));
+  }, []);
 
   function startEdit(product: Product) {
     setEditing(product);
@@ -44,20 +60,8 @@ function ProductsPage() {
   }
 
   function startCreate() {
-    setEditing({
-      id: `prod-${Date.now()}`,
-      nama_produk: "",
-      harga: 0,
-      kategori: "Paket",
-      is_active: true,
-    });
-    setForm({
-      id: `prod-${Date.now()}`,
-      nama_produk: "",
-      harga: 0,
-      kategori: "Paket",
-      is_active: true,
-    });
+    setEditing({});
+    setForm({ nama_produk: "", harga: 0, kategori: "Paket", is_active: true });
   }
 
   function cancelEdit() {
@@ -65,20 +69,49 @@ function ProductsPage() {
     setForm({});
   }
 
-  function save() {
+  async function save() {
     if (!form.nama_produk || form.harga == null) return;
-    const product = { ...editing, ...form } as Product;
-    mockApi.upsertProduct(product);
-    refresh();
-    setEditing(null);
-    setForm({});
+    setSaving(true);
+    try {
+      await upsertProduct({
+        data: {
+          id: editing?.id,
+          nama_produk: form.nama_produk!,
+          harga: form.harga!,
+          kategori: form.kategori,
+          is_active: form.is_active ?? true,
+        },
+      });
+      toast.success("Produk berhasil disimpan!");
+      await refresh();
+      setEditing(null);
+      setForm({});
+    } catch (err) {
+      toast.error("Gagal menyimpan produk");
+      console.error(err);
+    } finally {
+      setSaving(false);
+    }
   }
 
-  function remove(id: string) {
-    if (confirm("Yakin hapus produk ini?")) {
-      mockApi.deleteProduct(id);
-      refresh();
+  async function remove(id: string) {
+    if (!confirm("Yakin hapus produk ini?")) return;
+    try {
+      await deactivateProduct({ data: { id } });
+      toast.success("Produk berhasil dihapus");
+      await refresh();
+    } catch (err) {
+      toast.error("Gagal menghapus produk");
+      console.error(err);
     }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand-red border-t-transparent" />
+      </div>
+    );
   }
 
   return (
@@ -99,11 +132,11 @@ function ProductsPage() {
         </Button>
       </div>
 
-      {editing && (
+      {editing !== null && (
         <Card>
           <CardHeader>
             <CardTitle className="text-lg">
-              {editing.nama_produk ? "Edit Produk" : "Produk Baru"}
+              {editing.id ? "Edit Produk" : "Produk Baru"}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -145,15 +178,15 @@ function ProductsPage() {
                   </SelectContent>
                 </Select>
               </div>
-              
             </div>
             <div className="flex gap-2">
               <Button
                 onClick={save}
+                disabled={saving}
                 className="gap-2 bg-brand-red hover:bg-brand-red/90"
               >
                 <Save className="h-4 w-4" />
-                Simpan
+                {saving ? "Menyimpan..." : "Simpan"}
               </Button>
               <Button variant="outline" onClick={cancelEdit} className="gap-2">
                 <X className="h-4 w-4" />
@@ -172,19 +205,17 @@ function ProductsPage() {
                 <TableHead>Nama Produk</TableHead>
                 <TableHead>Kategori</TableHead>
                 <TableHead className="text-right">Harga</TableHead>
-
                 <TableHead className="w-[120px]" />
               </TableRow>
             </TableHeader>
             <TableBody>
-              {products.map((p) => (
+              {products.filter((p) => p.is_active).map((p) => (
                 <TableRow key={p.id}>
                   <TableCell className="font-medium">{p.nama_produk}</TableCell>
                   <TableCell>{p.kategori}</TableCell>
                   <TableCell className="text-right">
                     Rp {p.harga.toLocaleString("id-ID")}
                   </TableCell>
-                  
                   <TableCell>
                     <div className="flex gap-1">
                       <Button
