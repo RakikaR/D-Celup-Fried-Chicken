@@ -12,7 +12,7 @@ import { Toaster } from "sonner";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
-import { AuthProvider } from "@/hooks/use-auth";
+import { AuthProvider, useAuth } from "@/hooks/use-auth";
 
 function NotFoundComponent() {
   return (
@@ -126,13 +126,38 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+/**
+ * AuthGate — menahan render <Outlet /> sampai session Supabase selesai dicek.
+ *
+ * Tanpa ini, useEffect di route-route anak berjalan sebelum JWT siap,
+ * sehingga callWithAuth() mengirim request tanpa token dan RLS memblokir data.
+ *
+ * Dengan ini, semua route anak dijamin baru render (dan fetch data) setelah
+ * JWT sudah tersedia di session — tanpa perlu ubah satu pun route file.
+ */
+function AuthGate({ children }: { children: ReactNode }) {
+  const { isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand-red border-t-transparent" />
+      </div>
+    );
+  }
+
+  return <>{children}</>;
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <Outlet />
+        <AuthGate>
+          <Outlet />
+        </AuthGate>
         <Toaster position="top-right" richColors />
       </AuthProvider>
     </QueryClientProvider>
