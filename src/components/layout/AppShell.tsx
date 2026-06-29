@@ -42,8 +42,8 @@ function SidebarItem({
       to={to}
       onClick={onClick}
       className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${active
-          ? "bg-brand-red text-primary-foreground"
-          : "text-foreground hover:bg-accent"
+        ? "bg-brand-red text-primary-foreground"
+        : "text-foreground hover:bg-accent"
         }`}
     >
       <Icon className="h-5 w-5 shrink-0" />
@@ -67,7 +67,7 @@ export function AppShell() {
   const currentOutlet = outlets.find((o) => o.id === currentOutletId) ?? null;
   const outletName = currentOutlet?.nama_outlet ?? "Outlet";
 
-  // 1. KONTEN SIDEBAR DIPISAH AGAR BISA DIPAKAI DI DESKTOP & MOBILE MENU
+  // KONTEN SIDEBAR DIPISAH AGAR BISA DIPAKAI DI DESKTOP & MOBILE MENU
   const SidebarContent = () => (
     <div className="flex h-full flex-col bg-card px-4 py-6">
       <div className="mb-8 flex items-center gap-3 px-2">
@@ -175,10 +175,10 @@ export function AppShell() {
   );
 
   return (
-    // 2. STRUKTUR UTAMA LAYOUT RESPONSIVE
+    // STRUKTUR UTAMA LAYOUT RESPONSIVE
     <div className="flex h-screen w-full bg-background overflow-hidden">
 
-      {/* 3. SIDEBAR DESKTOP (Hanya muncul di layar menengah/besar: md:flex) */}
+      {/* SIDEBAR DESKTOP (Hanya muncul di layar menengah/besar: md:flex) */}
       <aside className="hidden md:flex w-64 shrink-0 flex-col border-r border-border h-full">
         <SidebarContent />
       </aside>
@@ -186,7 +186,7 @@ export function AppShell() {
       {/* Pembungkus Konten Kanan */}
       <div className="flex-1 flex flex-col h-full overflow-hidden">
 
-        {/* 4. HEADER MOBILE (Hanya muncul di layar sempit/HP: md:hidden) */}
+        {/* HEADER MOBILE (Hanya muncul di layar sempit/HP: md:hidden) */}
         <header className="flex md:hidden h-14 items-center justify-between border-b border-border bg-card px-4 shrink-0">
           <div className="flex items-center gap-3">
             <Sheet>
@@ -208,7 +208,7 @@ export function AppShell() {
           </div>
         </header>
 
-        {/* 5. AREA KONTEN UTAMA */}
+        {/* AREA KONTEN UTAMA */}
         <main className="flex-1 overflow-y-auto p-4 md:p-6">
           <Outlet />
         </main>

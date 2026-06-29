@@ -10,10 +10,10 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as RegisterRouteImport } from './routes/register'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AppOutletRouteImport } from './routes/app.outlet'
 import { Route as AppHqRouteImport } from './routes/app.hq'
 import { Route as AppOutletIndexRouteImport } from './routes/app.outlet.index'
 import { Route as AppHqIndexRouteImport } from './routes/app.hq.index'
@@ -27,6 +27,11 @@ import { Route as AppHqOutletsOutletIdRouteImport } from './routes/app.hq.outlet
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RegisterRoute = RegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -44,20 +49,15 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AppOutletRoute = AppOutletRouteImport.update({
-  id: '/outlet',
-  path: '/outlet',
-  getParentRoute: () => AppRoute,
-} as any)
 const AppHqRoute = AppHqRouteImport.update({
   id: '/hq',
   path: '/hq',
   getParentRoute: () => AppRoute,
 } as any)
 const AppOutletIndexRoute = AppOutletIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AppOutletRoute,
+  id: '/outlet/',
+  path: '/outlet/',
+  getParentRoute: () => AppRoute,
 } as any)
 const AppHqIndexRoute = AppHqIndexRouteImport.update({
   id: '/',
@@ -65,19 +65,19 @@ const AppHqIndexRoute = AppHqIndexRouteImport.update({
   getParentRoute: () => AppHqRoute,
 } as any)
 const AppOutletSalesRoute = AppOutletSalesRouteImport.update({
-  id: '/sales',
-  path: '/sales',
-  getParentRoute: () => AppOutletRoute,
+  id: '/outlet/sales',
+  path: '/outlet/sales',
+  getParentRoute: () => AppRoute,
 } as any)
 const AppOutletInventoryRoute = AppOutletInventoryRouteImport.update({
-  id: '/inventory',
-  path: '/inventory',
-  getParentRoute: () => AppOutletRoute,
+  id: '/outlet/inventory',
+  path: '/outlet/inventory',
+  getParentRoute: () => AppRoute,
 } as any)
 const AppOutletHistoryRoute = AppOutletHistoryRouteImport.update({
-  id: '/history',
-  path: '/history',
-  getParentRoute: () => AppOutletRoute,
+  id: '/outlet/history',
+  path: '/outlet/history',
+  getParentRoute: () => AppRoute,
 } as any)
 const AppHqReportsRoute = AppHqReportsRouteImport.update({
   id: '/reports',
@@ -99,9 +99,9 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
+  '/register': typeof RegisterRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/app/hq': typeof AppHqRouteWithChildren
-  '/app/outlet': typeof AppOutletRouteWithChildren
   '/app/hq/products': typeof AppHqProductsRoute
   '/app/hq/reports': typeof AppHqReportsRoute
   '/app/outlet/history': typeof AppOutletHistoryRoute
@@ -115,6 +115,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
+  '/register': typeof RegisterRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/app/hq/products': typeof AppHqProductsRoute
   '/app/hq/reports': typeof AppHqReportsRoute
@@ -130,9 +131,9 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
+  '/register': typeof RegisterRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/app/hq': typeof AppHqRouteWithChildren
-  '/app/outlet': typeof AppOutletRouteWithChildren
   '/app/hq/products': typeof AppHqProductsRoute
   '/app/hq/reports': typeof AppHqReportsRoute
   '/app/outlet/history': typeof AppOutletHistoryRoute
@@ -148,9 +149,9 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/auth'
+    | '/register'
     | '/sitemap.xml'
     | '/app/hq'
-    | '/app/outlet'
     | '/app/hq/products'
     | '/app/hq/reports'
     | '/app/outlet/history'
@@ -164,6 +165,7 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/auth'
+    | '/register'
     | '/sitemap.xml'
     | '/app/hq/products'
     | '/app/hq/reports'
@@ -178,9 +180,9 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/auth'
+    | '/register'
     | '/sitemap.xml'
     | '/app/hq'
-    | '/app/outlet'
     | '/app/hq/products'
     | '/app/hq/reports'
     | '/app/outlet/history'
@@ -195,6 +197,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRoute: typeof AppRouteWithChildren
   AuthRoute: typeof AuthRoute
+  RegisterRoute: typeof RegisterRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
 }
 
@@ -205,6 +208,13 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -228,13 +238,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/app/outlet': {
-      id: '/app/outlet'
-      path: '/outlet'
-      fullPath: '/app/outlet'
-      preLoaderRoute: typeof AppOutletRouteImport
-      parentRoute: typeof AppRoute
-    }
     '/app/hq': {
       id: '/app/hq'
       path: '/hq'
@@ -244,10 +247,10 @@ declare module '@tanstack/react-router' {
     }
     '/app/outlet/': {
       id: '/app/outlet/'
-      path: '/'
+      path: '/outlet'
       fullPath: '/app/outlet/'
       preLoaderRoute: typeof AppOutletIndexRouteImport
-      parentRoute: typeof AppOutletRoute
+      parentRoute: typeof AppRoute
     }
     '/app/hq/': {
       id: '/app/hq/'
@@ -258,24 +261,24 @@ declare module '@tanstack/react-router' {
     }
     '/app/outlet/sales': {
       id: '/app/outlet/sales'
-      path: '/sales'
+      path: '/outlet/sales'
       fullPath: '/app/outlet/sales'
       preLoaderRoute: typeof AppOutletSalesRouteImport
-      parentRoute: typeof AppOutletRoute
+      parentRoute: typeof AppRoute
     }
     '/app/outlet/inventory': {
       id: '/app/outlet/inventory'
-      path: '/inventory'
+      path: '/outlet/inventory'
       fullPath: '/app/outlet/inventory'
       preLoaderRoute: typeof AppOutletInventoryRouteImport
-      parentRoute: typeof AppOutletRoute
+      parentRoute: typeof AppRoute
     }
     '/app/outlet/history': {
       id: '/app/outlet/history'
-      path: '/history'
+      path: '/outlet/history'
       fullPath: '/app/outlet/history'
       preLoaderRoute: typeof AppOutletHistoryRouteImport
-      parentRoute: typeof AppOutletRoute
+      parentRoute: typeof AppRoute
     }
     '/app/hq/reports': {
       id: '/app/hq/reports'
@@ -317,32 +320,20 @@ const AppHqRouteChildren: AppHqRouteChildren = {
 
 const AppHqRouteWithChildren = AppHqRoute._addFileChildren(AppHqRouteChildren)
 
-interface AppOutletRouteChildren {
+interface AppRouteChildren {
+  AppHqRoute: typeof AppHqRouteWithChildren
   AppOutletHistoryRoute: typeof AppOutletHistoryRoute
   AppOutletInventoryRoute: typeof AppOutletInventoryRoute
   AppOutletSalesRoute: typeof AppOutletSalesRoute
   AppOutletIndexRoute: typeof AppOutletIndexRoute
 }
 
-const AppOutletRouteChildren: AppOutletRouteChildren = {
+const AppRouteChildren: AppRouteChildren = {
+  AppHqRoute: AppHqRouteWithChildren,
   AppOutletHistoryRoute: AppOutletHistoryRoute,
   AppOutletInventoryRoute: AppOutletInventoryRoute,
   AppOutletSalesRoute: AppOutletSalesRoute,
   AppOutletIndexRoute: AppOutletIndexRoute,
-}
-
-const AppOutletRouteWithChildren = AppOutletRoute._addFileChildren(
-  AppOutletRouteChildren,
-)
-
-interface AppRouteChildren {
-  AppHqRoute: typeof AppHqRouteWithChildren
-  AppOutletRoute: typeof AppOutletRouteWithChildren
-}
-
-const AppRouteChildren: AppRouteChildren = {
-  AppHqRoute: AppHqRouteWithChildren,
-  AppOutletRoute: AppOutletRouteWithChildren,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
@@ -351,6 +342,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
   AuthRoute: AuthRoute,
+  RegisterRoute: RegisterRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
 }
 export const routeTree = rootRouteImport

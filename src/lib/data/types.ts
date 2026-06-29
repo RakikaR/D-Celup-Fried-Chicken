@@ -52,3 +52,5 @@ export interface User {
   role: Role;
   outlet_id?: string;
 }
+
+
